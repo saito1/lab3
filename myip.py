@@ -1,4 +1,5 @@
 from myiputils import *
+from ipaddress import ip_network, ip_address
 
 
 class CamadaRede:
@@ -30,7 +31,14 @@ class CamadaRede:
         # TODO: Use a tabela de encaminhamento para determinar o próximo salto
         # (next_hop) a partir do endereço de destino do datagrama (dest_addr).
         # Retorne o next_hop para o dest_addr fornecido.
-        pass
+        dest_addr = ip_address(dest_addr)
+
+        for item in self.tabela:
+            network = item[0]
+            if dest_addr in network:
+                return str(item[1])
+
+        return None
 
     def definir_endereco_host(self, meu_endereco):
         """
@@ -50,7 +58,10 @@ class CamadaRede:
         """
         # TODO: Guarde a tabela de encaminhamento. Se julgar conveniente,
         # converta-a em uma estrutura de dados mais eficiente.
-        pass
+        self.tabela = [(ip_network(item[0]), ip_address(item[1]))
+                       for item in tabela]
+        self.tabela.sort(key=lambda tup: tup[0].prefixlen)
+        self.tabela.reverse()
 
     def registrar_recebedor(self, callback):
         """
